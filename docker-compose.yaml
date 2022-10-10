@@ -31,7 +31,8 @@ services:
     volumes:
       # Local path where the database will be stored.
       - ./store/mariadb:/var/lib/mysql
-
+    ports:
+      - 3307:3306
 
   # eclipse-mosquitto (MQTT broker)
   eclipse-mosquitto:
@@ -40,8 +41,7 @@ services:
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ./config/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-
+      - ./config/mosquitto:/mosquitto.config
 
   # zigbee2mqtt
   zigbee2mqtt:
@@ -50,14 +50,13 @@ services:
     restart: unless-stopped
     network_mode: host
     environment:
-      - TZ=Europe/Amsterdam
+      - TZ=Europe/Madrid
     volumes:
       - ./config/zigbee2mqtt:/app/data
       - /run/udev:/run/udev:ro 
     devices:
       - "${ZIGBEE_ADAPTER_TTY}:/dev/ttyZigbee"
     privileged: true
-
 
  # Visual Studio code
   vscode:
@@ -72,3 +71,13 @@ services:
    ports:
      - "8443:8443"
    command: code-server --auth password --port 8443 --disable-telemetry /home/coder/project
+
+  nodered:
+    container_name: nodered
+    image: nodered/node-red:latest
+    environment:
+      - TZ=Europe/Madrid
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./config/nodered:/data
